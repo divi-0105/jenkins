@@ -1,0 +1,18 @@
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm  // This step makes sure the repository is checked out
+            }
+        }
+        stage('Get Branch Name') {
+            steps {
+                script {
+                    // The branch name can be extracted from the git environment variables
+                    echo "The branch name is: ${env.GIT_BRANCH}"
+                }
+            }
+        }
+    }
+}
