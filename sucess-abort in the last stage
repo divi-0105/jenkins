@@ -1,0 +1,53 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Initial Stage') {
+            steps {
+                script {
+                    echo "This is the initial stage."
+                }
+            }
+        }
+
+        stage('Middle Stage') {
+            steps {
+                script {
+                    echo "This is the middle stage."
+                }
+            }
+        }
+
+        stage('Final Stage') {
+            steps {
+                script {
+                    echo "This is the final stage before confirmation."
+
+                    // User confirmation at the end of the pipeline
+                    def userInput = input(
+                        message: 'Do you want to continue?', 
+                        parameters: [
+                            choice(name: 'Proceed', choices: ['Yes', 'Cancel'], description: 'Choose whether to continue or cancel.')
+                        ]
+                    )
+
+                    // Check user's choice and decide whether to continue or abort
+                    if (userInput == 'Cancel') {
+                        error("Pipeline aborted by user.")  // This will cause the pipeline to fail
+                    } else {
+                        echo "User confirmed to proceed. Continuing the pipeline."
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo "Pipeline completed successfully."
+        }
+        failure {
+            echo "Pipeline failed or was aborted."
+        }
+    }
+}
