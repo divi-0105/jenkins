@@ -1,0 +1,21 @@
+pipeline {
+    agent any
+    environment {
+        BRANCH_NAME = 'main' // You can replace with a dynamic value like GIT_BRANCH
+    }
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Building the project...'
+            }
+        }
+        stage('Test') {
+            when {
+                expression { return env.BRANCH_NAME == 'main' }
+            }
+            steps {
+                echo 'Running tests...'
+            }
+        }
+    }
+}
