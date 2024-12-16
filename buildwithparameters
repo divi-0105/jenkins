@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    parameters {
+        string(name: 'ENVIRONMENT', defaultValue: 'dev', description: 'Environment to deploy (e.g., dev, staging, prod)')
+        booleanParam(name: 'RUN_TESTS', defaultValue: true, description: 'Run tests before deployment?')
+        choice(name: 'DEPLOY_OPTION', choices: ['Full Deployment', 'Partial Deployment'], description: 'Choose deployment type')
+    }
+
+    stages {
+        stage('Initialization') {
+            steps {
+                script {
+                    echo "Initializing pipeline..."
+                    echo "Environment: ${params.ENVIRONMENT}"
+                    echo "Run Tests: ${params.RUN_TESTS}"
+                    echo "Deployment Option: ${params.DEPLOY_OPTION}"
+                }
+            }
+        }
+
+        stage('Code Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/example/repo.git'
+            }
+        }
+
+        stage('Run Tests') {
+            when {
+                expression { params.RUN_TESTS }
+            }
+            steps {
+                echo "Running tests on ${params.ENVIRONMENT} environment..."
+                // Add your test commands here
+            }
+        }
+
+        stage('Deployment') {
+            steps {
+                script {
+                    if (params.DEPLOY_OPTION == 'Full Deployment') {
+                        echo "Performing full deployment to ${params.ENVIRONMENT} environment..."
+                        // Add deployment logic here
+                    } else {
+                        echo "Performing partial deployment to ${params.ENVIRONMENT} environment..."
+                        // Add partial deployment logic here
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline execution completed."
+        }
+    }
+}
