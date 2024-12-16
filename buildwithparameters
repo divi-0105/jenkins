@@ -21,7 +21,7 @@ pipeline {
 
         stage('Code Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/example/repo.git'
+                git branch: 'main', url: 'https://github.com/divi-0105/jenkins.git'
             }
         }
 
