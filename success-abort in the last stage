@@ -26,9 +26,7 @@ pipeline {
                     // User confirmation at the end of the pipeline
                     def userInput = input(
                         message: 'Do you want to continue?', 
-                        parameters: [
-                            choice(name: 'Proceed', choices: ['Yes', 'Cancel'], description: 'Choose whether to continue or cancel.')
-                        ]
+                        
                     )
 
                     // Check user's choice and decide whether to continue or abort
