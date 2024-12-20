@@ -5,9 +5,6 @@ pipeline {
         PRODUCT_TITLES = ''
     }
 
-    // Declare productTitles as a global variable
-    def productTitles = []
-
     stages {
         stage('Fetch Products') {
             steps {
