@@ -33,6 +33,7 @@ pipeline {
             steps {
                 script {
                     // Ensure the PRODUCT_TITLES environment variable is correctly split into choices
+                    echo "Product titles fetched: ${productTitles}"
                     def choices = env.PRODUCT_TITLES.split(',')
 
                     // Prompt the user to select a product
