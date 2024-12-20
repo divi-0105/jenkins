@@ -15,7 +15,7 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
-                    productTitles = products.collect { it.title }
+                    def productTitles = products.collect { it.title }
                     echo "Product titles fetched: ${productTitles}"
 
                     // Check if there are any products
