@@ -5,6 +5,9 @@ pipeline {
         PRODUCT_TITLES = ''
     }
 
+    // Declare productTitles as a global variable
+    def productTitles = []
+
     stages {
         stage('Fetch Products') {
             steps {
@@ -15,7 +18,7 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
-                    def productTitles = products.collect { it.title }
+                    productTitles = products.collect { it.title }
                     echo "Product titles fetched: ${productTitles}"
 
                     // Check if there are any products
@@ -51,5 +54,5 @@ pipeline {
                 }
             }
         }
-    }   
+    }
 }
