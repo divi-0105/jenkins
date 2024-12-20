@@ -10,7 +10,9 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
+                    echo "Before fetch"
                     def productTitles = products.collect { it.title }
+                    echo "After fetch"
 
                     // Check if there are any products
                     if (productTitles.isEmpty()) {
