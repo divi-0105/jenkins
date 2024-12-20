@@ -15,7 +15,7 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
-                    productTitles = products.collect { it.title }
+                    def productTitles = products.collect { it.title }
                     echo "Product titles fetched: ${productTitles}"
 
                     // Check if there are any products
@@ -25,6 +25,7 @@ pipeline {
 
                     // Save the product titles to an environment variable
                     env.PRODUCT_TITLES = productTitles.join(',')
+                    echo "Product titles saved to environment variable: ${env.PRODUCT_TITLES}"
                 }
             }
         }
@@ -32,8 +33,14 @@ pipeline {
         stage('Choose Product') {
             steps {
                 script {
-                    // Ensure the PRODUCT_TITLES environment variable is correctly split into choices
+                    // Ensure the PRODUCT_TITLES environment variable is correctly set
+                    if (env.PRODUCT_TITLES == null || env.PRODUCT_TITLES.isEmpty()) {
+                        error 'Product titles environment variable is null or empty. Failing the job.'
+                    }
+
+                    // Convert the PRODUCT_TITLES environment variable to a list of choices
                     def choices = env.PRODUCT_TITLES.split(',')
+                    echo "Choices for product selection: ${choices}"
 
                     // Prompt the user to select a product
                     def selectedProduct = input message: 'Select a product', parameters: [
