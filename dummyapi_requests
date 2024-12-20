@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         PRODUCT_TITLES = ''
-    }
+    
 
     stages {
         stage('Fetch Products') {
@@ -51,5 +51,6 @@ pipeline {
                 }
             }
         }
-    }
+    } 
+  }  
 }
