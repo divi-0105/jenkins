@@ -1,0 +1,33 @@
+groovy
+pipeline {
+    agent any
+ 
+    stages {
+        stage('Fetch Products') {
+            steps {
+                script {
+                    // Fetching the product list from the API
+                    def response = httpRequest(url: 'https://fakestoreapi.com/products', validResponseCodes: '200')
+                    def products = readJSON(text: response.content)
+ 
+                    // Extracting the product titles
+                    def productTitles = products.collect { it.title }
+ 
+                    // User input for product selection
+                    def selectedProduct = input(
+                        id: 'userInput', message: 'Select a product:', parameters: [
+                            [$class: 'ChoiceParameterDefinition', name: 'PRODUCT', choices: productTitles.join('\n'), description: 'Choose a product from the list']
+                        ]
+                    )
+ 
+                    // Validate the selected product
+                    if (!productTitles.contains(selectedProduct)) {
+                        error("Selected product '${selectedProduct}' is not valid. Failing the job.")
+                    } else {
+                        echo "You selected: ${selectedProduct}"
+                    }
+                }
+            }
+        }
+    }
+}
