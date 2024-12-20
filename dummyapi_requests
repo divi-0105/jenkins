@@ -6,8 +6,10 @@ pipeline {
             steps {
                 script {
                     // Fetch the list of products from the API
+                    echo "Before fetch"
                     def response = httpRequest url: 'https://fakestoreapi.com/products/', validResponseCodes: '200'
                     def products = readJSON text: response.content
+                    echo "After fetch"
 
                     // Extract the titles of the products
                     echo "Before fetch"
