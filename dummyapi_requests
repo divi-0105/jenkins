@@ -15,7 +15,7 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
-                    def productTitles = products.collect { it.title }
+                    productTitles = products.collect { it.title }
                     echo "Product titles fetched: ${productTitles}"
 
                     // Check if there are any products
@@ -33,7 +33,6 @@ pipeline {
             steps {
                 script {
                     // Ensure the PRODUCT_TITLES environment variable is correctly split into choices
-                    echo "Product titles fetched: ${productTitles}"
                     def choices = env.PRODUCT_TITLES.split(',')
 
                     // Prompt the user to select a product
