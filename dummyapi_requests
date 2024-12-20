@@ -33,6 +33,7 @@ pipeline {
             steps {
                 script {
                     // Convert the PRODUCT_TITLES environment variable to a list of choices
+                    error 'choose product'
                     def choices = env.PRODUCT_TITLES.split(',')
 
                     // Prompt the user to select a product
