@@ -1,0 +1,51 @@
+pipeline {
+    agent any
+
+    environment {
+        PRODUCT_TITLES_FILE = ' '
+    }
+
+    stages {
+        stage('Fetch Products') {
+            steps {
+                script {
+                    // Fetch the list of products from the API
+                    echo "Fetching product titles from API..."
+                    def response = httpRequest url: 'https://fakestoreapi.com/products/', validResponseCodes: '200'
+                    def products = readJSON text: response.content
+
+                    // Extract the titles of the products
+                    def productTitles = products.collect { it.title }
+                    echo "Product titles fetched: ${productTitles}"
+
+                    // Check if there are any products
+                    if (productTitles.isEmpty()) {
+                        error 'No products found. Failing the job.'
+                    }
+
+                    // Save the product titles to a file
+                    writeFile file: env.PRODUCT_TITLES_FILE, text: productTitles.join(',')
+                    echo "Product titles saved to file: ${env.PRODUCT_TITLES_FILE}"
+                }
+            }
+        }
+
+        stage('Choose Product') {
+            steps {
+                script {
+                    // Read the product titles from the file
+                    def productTitles = readFile(env.PRODUCT_TITLES_FILE).split(',')
+                    
+                    echo "Choices for product selection: ${productTitles}"
+
+                    // Prompt the user to select a product
+                    def selectedProduct = input message: 'Select a product', parameters: [
+                        choice(name: 'Product', choices: productTitles.join('\n'), description: 'Select a product from the list')
+                    ]
+
+                    echo "Selected Product: ${selectedProduct}"
+                }
+            }
+        }
+    }
+}
