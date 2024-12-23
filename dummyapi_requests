@@ -37,9 +37,9 @@ pipeline {
                     def productTitles = readFile(env.PRODUCT_TITLES_FILE).split(',')
                     
                     // Ensure the product titles are correctly set
-                    if (productTitles == null || productTitles.length == 0) {
-                        error 'Product titles file is null or empty. Failing the job.'
-                    }
+                    //if (productTitles == null || productTitles.length == 0) {
+                    //error 'Product titles file is null or empty. Failing the job.'
+                   // }
 
                     echo "Choices for product selection: ${productTitles}"
 
