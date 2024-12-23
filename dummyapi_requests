@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        PRODUCT_TITLES_FILE = 'productTitles.txt'
+    }
+
     stages {
         stage('Fetch Products') {
             steps {
@@ -11,43 +15,40 @@ pipeline {
                     def products = readJSON text: response.content
 
                     // Extract the titles of the products
-                    def prod_titles = products.collect { it.title }
-                    echo "Product titles fetched: ${prod_titles}"
+                    def productTitles = products.collect { it.title }
+                    echo "Product titles fetched: ${productTitles}"
 
                     // Check if there are any products
-                    if (prod_titles.isEmpty()) {
+                    if (productTitles.isEmpty()) {
                         error 'No products found. Failing the job.'
                     }
 
-                    // Save the product titles to an environment variable
-                    def title_str = prod_titles.join(',')
-                    echo "Product titles string: $title_str}"
+                    // Save the product titles to a file
+                    writeFile file: env.PRODUCT_TITLES_FILE, text: productTitles.join(',')
+                    echo "Product titles saved to file: ${env.PRODUCT_TITLES_FILE}"
+                }
+            }
+        }
 
-                    // Use withEnv to set the environment variable dynamically
-                    withEnv(["PRODUCT_TITLES=${title_str}"]) {
-                        // Call the next stage
-                        stage('Choose Product') {
-                            steps {
-                                script {
-                                    // Ensure the PRODUCT_TITLES environment variable is correctly set
-                                    if (env.PRODUCT_TITLES == null || env.PRODUCT_TITLES.isEmpty()) {
-                                        error 'Product titles environment variable is null or empty. Failing the job.'
-                                    }
-
-                                    // Convert the PRODUCT_TITLES environment variable to a list of choices
-                                    def choices = env.PRODUCT_TITLES.split(',')
-                                    echo "Choices for product selection: ${choices}"
-
-                                    // Prompt the user to select a product
-                                    def selectedProduct = input message: 'Select a product', parameters: [
-                                        choice(name: 'Product', choices: choices.join('\n'), description: 'Select a product from the list')
-                                    ]
-
-                                    echo "Selected Product: ${selectedProduct}"
-                                }
-                            }
-                        }
+        stage('Choose Product') {
+            steps {
+                script {
+                    // Read the product titles from the file
+                    def productTitles = readFile(env.PRODUCT_TITLES_FILE).split(',')
+                    
+                    // Ensure the product titles are correctly set
+                    if (productTitles == null || productTitles.isEmpty()) {
+                        error 'Product titles file is null or empty. Failing the job.'
                     }
+
+                    echo "Choices for product selection: ${productTitles}"
+
+                    // Prompt the user to select a product
+                    def selectedProduct = input message: 'Select a product', parameters: [
+                        choice(name: 'Product', choices: productTitles.join('\n'), description: 'Select a product from the list')
+                    ]
+
+                    echo "Selected Product: ${selectedProduct}"
                 }
             }
         }
