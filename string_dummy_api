@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Fetch Products') {
+            steps {
+                script {
+                    echo 'Fetching product titles from API...'
+                    def response = httpRequest url: 'https://fakestoreapi.com/products/'
+                    if (response.status == 200) {
+                        def products = readJSON text: response.content
+                        // Extract titles and store them in a list
+                        def titles = products.collect { it.title }
+                        echo "Product titles fetched: ${titles}"
+                        // Save titles list to currentBuild object for access in subsequent stages
+                        currentBuild.description = titles.join(',')
+                    } else {
+                        error "Failed to fetch products. Status: ${response.status}"
+                    }
+                }
+            }
+        }
+
+        stage('Choose Product') {
+            steps {
+                script {
+                    // Retrieve titles from currentBuild description
+                    def titles = currentBuild.description.split(',')
+                    echo "Product titles array: ${titles}"
+                    
+                    // Display dropdown and get user input
+                    def userChoice = input message: 'Select a product title', ok: 'Submit',
+                        parameters: [choice(name: 'Product Title', choices: titles.join('\n'), description: 'Choose a product title')]
+                    
+                    echo "User selected product: ${userChoice}"
+                    // Further processing with userChoice
+                }
+            }
+        }
+    }
+}
