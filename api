@@ -37,7 +37,13 @@ pipeline {
                     if (product_titles) {
                         def titlesArray = product_titles.split(',')
                         echo "Product titles array: ${titlesArray}"
-                        // Further processing with titlesArray
+                        
+                        // Display dropdown and get user input
+                        def userChoice = input message: 'Select a product title', ok: 'Submit',
+                            parameters: [choice(name: 'Product Title', choices: titlesArray.join('\n'), description: 'Choose a product title')]
+                        
+                        echo "User selected product: ${userChoice}"
+                        // Further processing with userChoice
                     } else {
                         error 'No product titles fetched. Cannot proceed.'
                     }
