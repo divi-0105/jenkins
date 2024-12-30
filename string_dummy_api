@@ -1,6 +1,11 @@
 pipeline {
     agent any
 
+    environment {
+        // Initialize the product_titles variable to an empty string
+        product_titles = ''
+    }
+
     stages {
         stage('Fetch Products') {
             steps {
@@ -9,11 +14,10 @@ pipeline {
                     def response = httpRequest url: 'https://fakestoreapi.com/products/'
                     if (response.status == 200) {
                         def products = readJSON text: response.content
-                        // Extract titles and store them in a list
                         def titles = products.collect { it.title }
-                        echo "Product titles fetched: ${titles}"
-                        // Save titles list to currentBuild object for access in subsequent stages
-                        currentBuild.description = titles.join(',')
+                        // Use env to set environment variable
+                        env.product_titles = titles.join(',')
+                        echo "Product titles fetched: ${env.product_titles}"
                     } else {
                         error "Failed to fetch products. Status: ${response.status}"
                     }
@@ -22,31 +26,31 @@ pipeline {
         }
 
         stage('Choose Product') {
-        steps {
-            script {
-            // Ensure product_titles is not null before using split
-                if (product_titles) {
-                    def titlesArray = product_titles.split(',')
-                    echo "Product titles array: ${titlesArray}"
-                
-                // Display dropdown and get user input
-                    def userChoice = input message: 'Select a product title', ok: 'Submit',
-                        parameters: [string(name: 'Product Title', description: 'Enter or choose a product title', defaultValue: '', trim: true)]
-                
-                    echo "User entered product: ${userChoice}"
+            steps {
+                script {
+                    // Ensure product_titles is not null before using split
+                    if (env.product_titles) {
+                        def titlesArray = env.product_titles.split(',')
+                        echo "Product titles array: ${titlesArray}"
 
-                // Check if the entered product title is in the list
-                    if (!titlesArray.contains(userChoice)) {
-                        error "Invalid product title. The entered title '${userChoice}' is not in the list of fetched product titles."
-                }
-                
-                // Further processing with userChoice
-                    echo "Valid product title selected: ${userChoice}"
+                        // Display dropdown and get user input
+                        def userChoice = input message: 'Select a product title', ok: 'Submit',
+                            parameters: [string(name: 'Product Title', description: 'Enter or choose a product title', defaultValue: '', trim: true)]
+
+                        echo "User entered product: ${userChoice}"
+
+                        // Check if the entered product title is in the list
+                        if (!titlesArray.contains(userChoice)) {
+                            error "Invalid product title. The entered title '${userChoice}' is not in the list of fetched product titles."
+                        }
+
+                        // Further processing with userChoice
+                        echo "Valid product title selected: ${userChoice}"
                     } else {
-                    error 'No product titles fetched. Cannot proceed.'
+                        error 'No product titles fetched. Cannot proceed.'
+                    }
+                }
             }
         }
-    }
-}
     }
 }
