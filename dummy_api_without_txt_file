@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        PRODUCT_TITLES_FILE = ' '
+        PRODUCT_TITLES = '' // Initialize an environment variable to hold product titles
     }
 
     stages {
@@ -23,9 +23,9 @@ pipeline {
                         error 'No products found. Failing the job.'
                     }
 
-                    // Save the product titles to a file
-                    writeFile file: env.PRODUCT_TITLES_FILE, text: productTitles.join(',')
-                    echo "Product titles saved to file: ${env.PRODUCT_TITLES_FILE}"
+                    // Save the product titles to an environment variable
+                    env.PRODUCT_TITLES = productTitles.join(',')
+                    echo "Product titles saved to environment variable: ${env.PRODUCT_TITLES}"
                 }
             }
         }
@@ -33,9 +33,8 @@ pipeline {
         stage('Choose Product') {
             steps {
                 script {
-                    // Read the product titles from the file
-                    //def productTitles = readFile(env.PRODUCT_TITLES_FILE).split(',')
-                    def productTitles = env.PRODUCT_TITLES_FILE.split(',')
+                    // Read the product titles from the environment variable
+                    def productTitles = env.PRODUCT_TITLES.split(',')
                     
                     echo "Choices for product selection: ${productTitles}"
 
