@@ -7,12 +7,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout SCM') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Fetch Products') {
             steps {
                 script {
@@ -22,7 +16,7 @@ pipeline {
                         def products = readJSON text: response.content
                         def titles = products.collect { it.title }
                         product_titles = titles.join(',')
-                        echo "Product titles fetched: ${titles}"
+                        echo "Product titles fetched: ${product_titles}"
                     } else {
                         error "Failed to fetch products. Status: ${response.status}"
                     }
