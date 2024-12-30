@@ -26,31 +26,31 @@ pipeline {
         }
 
         stage('Choose Product') {
-    steps {
-        script {
-            // Ensure product_titles is not null before using split
-            if (product_titles) {
-                def titlesArray = product_titles.split(',')
-                echo "Product titles array: ${titlesArray}"
+            steps {
+                script {
+                    // Ensure product_titles is not null before using split
+                    if (product_titles) {
+                        def titlesArray = product_titles.split(',')
+                            echo "Product titles array: ${titlesArray}"
                 
-                // Display dropdown and get user input
-                def userChoice = input message: 'Select a product title', ok: 'Submit',
-                    parameters: [string(name: 'Product Title', description: 'Enter or choose a product title', defaultValue: '', trim: true)]
+                    // Display dropdown and get user input
+                        def userChoice = input message: 'Select a product title', ok: 'Submit',
+                        parameters: [string(name: 'Product Title', description: 'Enter or choose a product title', defaultValue: '', trim: true)]
                 
-                echo "User entered product: ${userChoice}"
+                        echo "User entered product: ${userChoice}"
 
-                // Check if the entered product title is in the list
-                if (!titlesArray.contains(userChoice)) {
-                    error "Invalid product title. The entered title '${userChoice}' is not in the list of fetched product titles."
-                }
+                   // Check if the entered product title is in the list
+                        if (!titlesArray.contains(userChoice)) {
+                        error "Invalid product title. The entered title '${userChoice}' is not in the list of fetched product titles."
+                        }
                 
-                // Further processing with userChoice
-                echo "Valid product title selected: ${userChoice}"
-            } else {
-                error 'No product titles fetched. Cannot proceed.'
+                  // Further processing with userChoice
+                        echo "Valid product title selected: ${userChoice}"
+                            } else {
+                       error 'No product titles fetched. Cannot proceed.'
+                        }
+                    }
+                }
             }
         }
     }
-}
-    }
-}
