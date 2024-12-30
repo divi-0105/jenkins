@@ -37,7 +37,7 @@ pipeline {
                     // Read the product titles from the environment variable
                     def productTitles = env.PRODUCT_TITLES?.split(',')
                     
-                    if (productTitles == null || productTitles.isEmpty()) {
+                    if (productTitles == null || productTitles==0) {
                         error 'No product titles available for selection.'
                     }
 
