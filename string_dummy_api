@@ -30,9 +30,9 @@ pipeline {
                     
                     // Display dropdown and get user input
                     def userChoice = input message: 'Select a product title', ok: 'Submit',
-                        parameters: [choice(name: 'Product Title', choices: titles.join('\n'), description: 'Choose a product title')]
+                        parameters: [string(name: 'Product Title', description: 'Enter or choose a product title', defaultValue: '')]
                     
-                    echo "User selected product: ${userChoice}"
+                    echo "User entered product: ${userChoice}"
                     // Further processing with userChoice
                 }
             }
