@@ -24,20 +24,22 @@ pipeline {
                     }
 
                     // Save the product titles to an environment variable using withEnv
-                    script {
-                        env.PRODUCT_TITLES = productTitles.join(',')
-                    }
+                    env.PRODUCT_TITLES = productTitles.join(',')
+                    echo "Product titles saved to environment variable: ${env.PRODUCT_TITLES}"
                 }
             }
         }
 
         stage('Choose Product') {
+            environment {
+                PRODUCT_TITLES = "${env.PRODUCT_TITLES}" // Ensure the variable is carried over
+            }
             steps {
                 script {
                     // Read the product titles from the environment variable
                     def productTitles = env.PRODUCT_TITLES?.split(',')
                     
-                    if (productTitles == null || productTitles==0) {
+                    if (productTitles == null || productTitles.isEmpty()) {
                         error 'No product titles available for selection.'
                     }
 
