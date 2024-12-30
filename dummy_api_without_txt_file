@@ -34,8 +34,12 @@ pipeline {
             steps {
                 script {
                     // Read the product titles from the environment variable
-                    def productTitles = env.PRODUCT_TITLES.split(',')
+                    def productTitles = env.PRODUCT_TITLES?.split(',')
                     
+                    if (productTitles == null || productTitles.isEmpty()) {
+                        error 'No product titles available for selection.'
+                    }
+
                     echo "Choices for product selection: ${productTitles}"
 
                     // Prompt the user to select a product
