@@ -24,8 +24,8 @@ pipeline {
                     }
 
                     // Save the product titles to an environment variable using withEnv
-                    withEnv(["PRODUCT_TITLES=${productTitles.join(',')}"]) {
-                        echo "Product titles saved to environment variable: ${env.PRODUCT_TITLES}"
+                    script {
+                        env.PRODUCT_TITLES = productTitles.join(',')
                     }
                 }
             }
