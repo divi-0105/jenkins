@@ -2,30 +2,29 @@ pipeline {
     agent any
 
     environment {
-        PRODUCT_TITLES = '' // Initialize an environment variable to hold product titles
+        // Initialize the product_titles variable to an empty string
+        product_titles = ''
     }
 
     stages {
+        stage('Checkout SCM') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Fetch Products') {
             steps {
                 script {
-                    // Fetch the list of products from the API
-                    echo "Fetching product titles from API..."
-                    def response = httpRequest url: 'https://fakestoreapi.com/products/', validResponseCodes: '200'
-                    def products = readJSON text: response.content
-
-                    // Extract the titles of the products
-                    def productTitles = products.collect { it.title }
-                    echo "Product titles fetched: ${productTitles}"
-
-                    // Check if there are any products
-                    if (productTitles.isEmpty()) {
-                        error 'No products found. Failing the job.'
-                    }
-
-                    // Save the product titles to an environment variable using withEnv
-                    withEnv(["PRODUCT_TITLES=${productTitles.join(',')}"]) {
-                        echo "Product titles saved to environment variable: ${env.PRODUCT_TITLES}"
+                    echo 'Fetching product titles from API...'
+                    def response = httpRequest url: 'https://fakestoreapi.com/products/'
+                    if (response.status == 200) {
+                        def products = readJSON text: response.content
+                        def titles = products.collect { it.title }
+                        product_titles = titles.join(',')
+                        echo "Product titles fetched: ${titles}"
+                    } else {
+                        error "Failed to fetch products. Status: ${response.status}"
                     }
                 }
             }
@@ -34,21 +33,14 @@ pipeline {
         stage('Choose Product') {
             steps {
                 script {
-                    // Read the product titles from the environment variable
-                    def productTitles = env.PRODUCT_TITLES.split(',')
-
-                    if (productTitles == null || productTitles.length == 0) {
-                        error 'No product titles available for selection.'
+                    // Ensure product_titles is not null before using split
+                    if (product_titles) {
+                        def titlesArray = product_titles.split(',')
+                        echo "Product titles array: ${titlesArray}"
+                        // Further processing with titlesArray
+                    } else {
+                        error 'No product titles fetched. Cannot proceed.'
                     }
-
-                    echo "Choices for product selection: ${productTitles}"
-
-                    // Prompt the user to select a product
-                    def selectedProduct = input message: 'Select a product', parameters: [
-                        choice(name: 'Product', choices: productTitles.join('\n'), description: 'Select a product from the list')
-                    ]
-
-                    echo "Selected Product: ${selectedProduct}"
                 }
             }
         }
